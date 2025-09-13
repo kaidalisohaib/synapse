@@ -128,12 +128,12 @@ export default function MatchesList() {
 
   const getStatusColor = (status) => {
     const colors = {
-      notified: 'bg-purple-100 text-purple-800',
-      accepted: 'bg-green-100 text-green-800',
-      declined: 'bg-red-100 text-red-800',
-      expired: 'bg-gray-100 text-gray-800'
+      notified: 'bg-purple-900/30 text-purple-200 border border-purple-500/30',
+      accepted: 'bg-green-900/30 text-green-200 border border-green-500/30',
+      declined: 'bg-red-900/30 text-red-200 border border-red-500/30',
+      expired: 'bg-slate-900/40 text-gray-200 border border-gray-500/30'
     }
-    return colors[status] || 'bg-gray-100 text-gray-800'
+    return colors[status] || 'bg-slate-900/40 text-gray-200 border border-gray-500/30'
   }
 
   if (loading) {
@@ -145,51 +145,58 @@ export default function MatchesList() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-8">
+      {/* Animated background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_65%,rgba(120,119,198,0.2),rgba(255,255,255,0))]"></div>
+        <div className="absolute top-20 left-20 w-32 h-32 bg-purple-500/10 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute bottom-28 right-28 w-40 h-40 bg-pink-500/10 rounded-full blur-xl animate-pulse delay-500"></div>
+      </div>
+
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Match Requests</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-white">Neural Match Requests</h1>
+          <p className="mt-2 text-gray-300">
             Students who are curious about topics you know well.
           </p>
         </div>
 
         <div className="mb-6">
-          <div className="text-sm text-gray-500">
-            {matches.length} total match{matches.length !== 1 ? 'es' : ''}
+          <div className="text-sm text-purple-400">
+            {matches.length} total neural match{matches.length !== 1 ? 'es' : ''}
           </div>
         </div>
 
         {matches.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
+          <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 text-center border border-purple-500/20 shadow-2xl">
             <div className="text-6xl mb-4">🔗</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No match requests yet</h3>
-            <p className="text-gray-500 mb-6">
+            <h3 className="text-lg font-medium text-white mb-2">No match requests yet</h3>
+            <p className="text-gray-300 mb-6">
               When someone has a question that matches your knowledge areas, you'll see their requests here.
             </p>
             <Link href="/profile">
-              <Button variant="outline" className="mr-4">
+              <Button variant="outline" className="mr-4 border-purple-500/50 text-purple-400 hover:bg-purple-600/20 hover:text-purple-300">
                 Update Your Knowledge Tags
               </Button>
             </Link>
             <Link href="/dashboard">
-              <Button>Back to Dashboard</Button>
+              <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">Back to Neural Hub</Button>
             </Link>
           </div>
         ) : (
           <div className="space-y-6">
             {matches.map((match) => (
-              <div key={match.id} className="bg-white rounded-lg shadow p-6">
+              <div key={match.id} className="bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20 shadow-2xl">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center mb-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(match.status)}`}>
                         {match.status}
                       </span>
-                      <span className="ml-3 text-sm text-gray-500">
+                      <span className="ml-3 text-sm text-gray-300">
                         Matched: {formatDate(match.created_at)}
                       </span>
-                      <span className="ml-3 text-sm text-gray-500">
+                      <span className="ml-3 text-sm text-gray-300">
                         Score: {match.match_score} points
                       </span>
                     </div>
@@ -198,33 +205,33 @@ export default function MatchesList() {
 
                 <div className="mb-4">
                   <div className="flex items-center mb-3">
-                    <h3 className="text-lg font-medium text-gray-900">
+                    <h3 className="text-lg font-medium text-white">
                       Request from {match.requests.profiles?.name || 'Anonymous Student'}
                     </h3>
-                    <span className="ml-2 text-sm text-gray-500">
+                    <span className="ml-2 text-sm text-gray-300">
                       ({match.requests.profiles?.faculty}, {match.requests.profiles?.year})
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-3">
+                  <p className="text-sm text-gray-300 mb-3">
                     Program: {match.requests.profiles?.program}
                   </p>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-gray-900 mb-2">Their Question:</h4>
-                    <p className="text-gray-800">{match.requests.request_text}</p>
+                  <div className="bg-slate-900/40 border border-purple-500/20 p-4 rounded-lg">
+                    <h4 className="font-medium text-white mb-2">Their Question:</h4>
+                    <p className="text-gray-200">{match.requests.request_text}</p>
                   </div>
                 </div>
 
                 <div className="mb-4">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-300">
                     Submitted: {formatDate(match.requests.created_at)}
                   </p>
                 </div>
 
                 {match.status === 'notified' && (
                   <div className="border-t pt-4">
-                    <div className="bg-yellow-50 p-4 rounded-lg mb-4">
-                      <h4 className="font-medium text-yellow-800 mb-2">Action Required:</h4>
-                      <p className="text-sm text-yellow-700 mb-4">
+                    <div className="bg-yellow-900/20 border border-yellow-500/30 p-4 rounded-lg mb-4">
+                      <h4 className="font-medium text-yellow-300 mb-2">Action Required:</h4>
+                      <p className="text-sm text-yellow-200 mb-4">
                         This student is curious about something you might know about. Would you like to help them learn?
                       </p>
                       <div className="flex space-x-3">
@@ -232,6 +239,7 @@ export default function MatchesList() {
                           onClick={() => handleMatchAction(match.id, 'accepted')}
                           disabled={actionLoading[match.id]}
                           size="sm"
+                          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                         >
                           {actionLoading[match.id] ? (
                             <div className="flex items-center">
@@ -248,6 +256,7 @@ export default function MatchesList() {
                           onClick={() => handleMatchAction(match.id, 'declined')}
                           disabled={actionLoading[match.id]}
                           size="sm"
+                          className="border-purple-500/50 text-purple-400 hover:bg-purple-600/20 hover:text-purple-300"
                         >
                           Decline
                         </Button>
@@ -258,12 +267,12 @@ export default function MatchesList() {
 
                 {match.status === 'accepted' && (
                   <div className="border-t pt-4">
-                    <div className="bg-green-50 p-4 rounded-lg">
+                    <div className="bg-green-900/20 border border-green-500/30 p-4 rounded-lg">
                       <div className="flex items-center">
-                        <span className="text-green-500 text-lg mr-2">✅</span>
+                        <span className="text-green-300 text-lg mr-2">✅</span>
                         <div>
-                          <h4 className="font-medium text-green-800">Connection Established!</h4>
-                          <p className="text-sm text-green-700">
+                          <h4 className="font-medium text-green-300">Connection Established!</h4>
+                          <p className="text-sm text-green-200">
                             You've accepted this request. Both you and the requester should have received an email with connection details.
                           </p>
                         </div>
@@ -274,12 +283,12 @@ export default function MatchesList() {
 
                 {match.status === 'declined' && (
                   <div className="border-t pt-4">
-                    <div className="bg-red-50 p-4 rounded-lg">
+                    <div className="bg-red-900/20 border border-red-500/30 p-4 rounded-lg">
                       <div className="flex items-center">
-                        <span className="text-red-500 text-lg mr-2">❌</span>
+                        <span className="text-red-300 text-lg mr-2">❌</span>
                         <div>
-                          <h4 className="font-medium text-red-800">Request Declined</h4>
-                          <p className="text-sm text-red-700">
+                          <h4 className="font-medium text-red-300">Request Declined</h4>
+                          <p className="text-sm text-red-200">
                             You declined this request. The system will look for other matches for this student.
                           </p>
                         </div>
@@ -290,12 +299,12 @@ export default function MatchesList() {
 
                 {match.status === 'expired' && (
                   <div className="border-t pt-4">
-                    <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="bg-slate-900/40 border border-gray-500/30 p-4 rounded-lg">
                       <div className="flex items-center">
-                        <span className="text-gray-500 text-lg mr-2">⏰</span>
+                        <span className="text-gray-300 text-lg mr-2">⏰</span>
                         <div>
-                          <h4 className="font-medium text-gray-800">Request Expired</h4>
-                          <p className="text-sm text-gray-700">
+                          <h4 className="font-medium text-gray-200">Request Expired</h4>
+                          <p className="text-sm text-gray-300">
                             This match request has expired. The system will look for other matches for this student.
                           </p>
                         </div>
@@ -310,7 +319,7 @@ export default function MatchesList() {
 
         <div className="mt-8 text-center">
           <Link href="/dashboard">
-            <Button variant="outline">Back to Dashboard</Button>
+            <Button variant="outline" className="border-purple-500/50 text-purple-400 hover:bg-purple-600/20 hover:text-purple-300">Back to Neural Hub</Button>
           </Link>
         </div>
       </div>

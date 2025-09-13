@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:basic": "node test-basic-functionality.js",
+    "test:setup": "node setup-test-data.js",
+    "test:cleanup": "node setup-test-data.js --cleanup"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

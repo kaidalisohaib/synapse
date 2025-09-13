@@ -92,38 +92,23 @@ export default function AcceptMatch() {
     setActionLoading(true)
     
     try {
-      // Update match status
-      const { error: updateError } = await supabase
-        .from('matches')
-        .update({ 
-          status: 'accepted',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', matchId)
-
-      if (updateError) {
-        setMessage('Failed to accept match. Please try again.')
-        setActionLoading(false)
-        return
-      }
-
-      // Update request status
-      await supabase
-        .from('requests')
-        .update({ status: 'confirmed' })
-        .eq('id', match.requests.id)
-
-      // Trigger connection email
-      const response = await fetch('/api/send-connection-email', {
+      const response = await fetch('/api/confirm-match', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ matchId }),
+        body: JSON.stringify({ 
+          matchId, 
+          action: 'accept' 
+        }),
       })
 
+      const result = await response.json()
+
       if (!response.ok) {
-        console.error('Connection email error:', response.statusText)
+        setMessage(result.error || 'Failed to accept match. Please try again.')
+        setActionLoading(false)
+        return
       }
 
       setAccepted(true)
@@ -140,16 +125,21 @@ export default function AcceptMatch() {
     setActionLoading(true)
     
     try {
-      const { error } = await supabase
-        .from('matches')
-        .update({ 
-          status: 'declined',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', matchId)
+      const response = await fetch('/api/confirm-match', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          matchId, 
+          action: 'decline' 
+        }),
+      })
 
-      if (error) {
-        setMessage('Failed to decline match. Please try again.')
+      const result = await response.json()
+
+      if (!response.ok) {
+        setMessage(result.error || 'Failed to decline match. Please try again.')
       } else {
         setMatch(prev => ({ ...prev, status: 'declined' }))
         setMessage('Match declined. The system will look for other potential matches for this student.')

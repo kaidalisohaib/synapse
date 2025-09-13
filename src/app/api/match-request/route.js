@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { rateLimit } from '@/lib/rateLimit'
 import { adminConfig, matchingConfig, securityConfig } from '@/lib/config'
+import { sendMatchNotificationEmail } from '@/lib/emailUtils'
 
 export async function POST(request) {
   try {
@@ -169,10 +170,33 @@ export async function POST(request) {
       bestMatch = alternativeMatch
     }
 
-    // Create the match record
-    const expiresAt = new Date()
-    expiresAt.setDate(expiresAt.getDate() + matchingConfig.expiryDays) // Configurable days to respond
+    // RACE CONDITION PROTECTION: Check if request already has active matches
+    const { data: existingMatches, error: existingError } = await supabase
+      .from('matches')
+      .select('id, status')
+      .eq('request_id', requestId)
+      .not('status', 'in', '(declined,expired)')
 
+    if (existingError) {
+      console.error('Error checking existing matches:', existingError)
+      return NextResponse.json(
+        { error: 'Error checking existing matches' },
+        { status: 500 }
+      )
+    }
+
+    if (existingMatches && existingMatches.length > 0) {
+      return NextResponse.json(
+        { message: 'Request already has active matches' },
+        { status: 409 }
+      )
+    }
+
+    // Create the match record with atomic operation
+    const expiresAt = new Date()
+    expiresAt.setDate(expiresAt.getDate() + matchingConfig.expiryDays)
+
+    // Create the match record
     const { data: matchData, error: matchError } = await supabase
       .from('matches')
       .insert({
@@ -199,15 +223,45 @@ export async function POST(request) {
       .update({ status: 'matched' })
       .eq('id', requestId)
 
-    // Note: Email notifications should be triggered by a separate system/cron job
-    // For now, we'll just log that a match was created
-    console.log(`Match created: ${matchData.id} with score ${bestMatch.score}`)
+    if (matchError) {
+      console.error('Error creating match:', matchError)
+      
+      // Handle specific error cases
+      if (matchError.message?.includes('already has active matches') || 
+          matchError.message?.includes('Active match already exists')) {
+        return NextResponse.json(
+          { message: 'Request already has active matches' },
+          { status: 409 }
+        )
+      }
+      
+      if (matchError.message?.includes('cannot be matched with themselves')) {
+        return NextResponse.json(
+          { message: 'Invalid match: self-matching not allowed' },
+          { status: 400 }
+        )
+      }
+      
+      return NextResponse.json(
+        { error: 'Error creating match' },
+        { status: 500 }
+      )
+    }
+
+    // Automatically send match notification email
+    try {
+      await sendMatchNotificationEmail(matchData.id)
+      console.log(`Match created and notification sent: ${matchData.id} with score ${bestMatch.score}`)
+    } catch (emailError) {
+      console.error('Error sending match notification email:', emailError)
+      // Don't fail the entire request if email fails - log and continue
+    }
 
     return NextResponse.json({
       success: true,
       matchId: matchData.id,
       matchScore: bestMatch.score,
-      message: 'Match found and created'
+      message: 'Match found, created, and notification sent'
     })
 
   } catch (error) {

@@ -77,12 +77,12 @@ export default function AdminOverview() {
 
   const getStatusColor = (status) => {
     const colors = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      matched: 'bg-blue-100 text-blue-800',
-      confirmed: 'bg-green-100 text-green-800',
-      completed: 'bg-gray-100 text-gray-800'
+      pending: 'bg-yellow-900/30 text-yellow-200 border border-yellow-500/30',
+      matched: 'bg-blue-900/30 text-blue-200 border border-blue-500/30',
+      confirmed: 'bg-green-900/30 text-green-200 border border-green-500/30',
+      completed: 'bg-slate-900/40 text-gray-200 border border-gray-500/30'
     }
-    return colors[status] || 'bg-gray-100 text-gray-800'
+    return colors[status] || 'bg-slate-900/40 text-gray-200 border border-gray-500/30'
   }
 
   if (loading) {
@@ -94,115 +94,124 @@ export default function AdminOverview() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p className="mt-2 text-gray-600">
-          Monitor and manage the Synapse platform
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Animated background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_75%,rgba(120,119,198,0.2),rgba(255,255,255,0))]"></div>
+        <div className="absolute top-20 left-20 w-32 h-32 bg-purple-500/10 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute bottom-28 right-28 w-40 h-40 bg-pink-500/10 rounded-full blur-xl animate-pulse delay-500"></div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard
-          title="Total Users"
-          value={stats.totalUsers}
-          subtitle={`${stats.completedProfiles} completed profiles`}
-          icon="👥"
-          color="blue"
-        />
-        <MetricCard
-          title="Total Requests"
-          value={stats.totalRequests}
-          subtitle={`${stats.pendingRequests} pending`}
-          icon="💭"
-          color="purple"
-        />
-        <MetricCard
-          title="Total Matches"
-          value={stats.totalMatches}
-          subtitle={`${stats.acceptedMatches} accepted`}
-          icon="🔗"
-          color="green"
-        />
-        <MetricCard
-          title="Pending Matches"
-          value={stats.pendingMatches}
-          subtitle="Awaiting response"
-          icon="⏳"
-          color="orange"
-        />
-      </div>
-
-      {/* System Health */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Activity */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Requests</h2>
-          
-          {recentActivity.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">No recent activity</p>
-          ) : (
-            <div className="space-y-4">
-              {recentActivity.map((request) => (
-                <div key={request.id} className="border-l-4 border-gray-200 pl-4">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium text-gray-900">
-                      {request.profiles?.name || 'Anonymous'}
-                    </span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
-                      {request.status}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-1">
-                    {request.profiles?.faculty}
-                  </p>
-                  <p className="text-sm text-gray-800 mb-2 line-clamp-2">
-                    {request.request_text.substring(0, 100)}...
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {formatDate(request.created_at)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-white">Admin Neural Console</h1>
+          <p className="mt-2 text-gray-300">
+            Monitor and manage the Synapse platform
+          </p>
         </div>
 
-        {/* System Status */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">System Status</h2>
-          
-          <div className="space-y-4">
-            <StatusItem
-              label="Database Connection"
-              status="healthy"
-              description="All database operations running normally"
-            />
-            <StatusItem
-              label="Email Service"
-              status="healthy"
-              description="Resend integration working"
-            />
-            <StatusItem
-              label="Matching Algorithm"
-              status="healthy"
-              description="Processing requests automatically"
-            />
-            <StatusItem
-              label="User Authentication"
-              status="healthy"
-              description="Supabase Auth operational"
-            />
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <MetricCard
+            title="Total Users"
+            value={stats.totalUsers}
+            subtitle={`${stats.completedProfiles} completed profiles`}
+            icon="👥"
+            color="blue"
+          />
+          <MetricCard
+            title="Total Requests"
+            value={stats.totalRequests}
+            subtitle={`${stats.pendingRequests} pending`}
+            icon="💭"
+            color="purple"
+          />
+          <MetricCard
+            title="Total Matches"
+            value={stats.totalMatches}
+            subtitle={`${stats.acceptedMatches} accepted`}
+            icon="🔗"
+            color="green"
+          />
+          <MetricCard
+            title="Pending Matches"
+            value={stats.pendingMatches}
+            subtitle="Awaiting response"
+            icon="⏳"
+            color="orange"
+          />
+        </div>
+
+        {/* System Health */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Recent Activity */}
+          <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-purple-500/20 shadow-xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Recent Requests</h2>
+
+            {recentActivity.length === 0 ? (
+              <p className="text-gray-300 text-center py-8">No recent activity</p>
+            ) : (
+              <div className="space-y-4">
+                {recentActivity.map((request) => (
+                  <div key={request.id} className="border-l-4 border-purple-500/30 pl-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-white">
+                        {request.profiles?.name || 'Anonymous'}
+                      </span>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
+                        {request.status}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-300 mb-1">
+                      {request.profiles?.faculty}
+                    </p>
+                    <p className="text-sm text-gray-200 mb-2 line-clamp-2">
+                      {request.request_text.substring(0, 100)}...
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {formatDate(request.created_at)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          
-          <div className="mt-6 p-4 bg-green-50 rounded-lg">
-            <div className="flex items-center">
-              <span className="text-green-500 text-lg mr-2">✅</span>
-              <div>
-                <h3 className="font-medium text-green-800">All Systems Operational</h3>
-                <p className="text-sm text-green-700">Last checked: {new Date().toLocaleTimeString()}</p>
+
+          {/* System Status */}
+          <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-purple-500/20 shadow-xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">System Status</h2>
+
+            <div className="space-y-4">
+              <StatusItem
+                label="Database Connection"
+                status="healthy"
+                description="All database operations running normally"
+              />
+              <StatusItem
+                label="Email Service"
+                status="healthy"
+                description="Resend integration working"
+              />
+              <StatusItem
+                label="Matching Algorithm"
+                status="healthy"
+                description="Processing requests automatically"
+              />
+              <StatusItem
+                label="User Authentication"
+                status="healthy"
+                description="Supabase Auth operational"
+              />
+            </div>
+
+            <div className="mt-6 p-4 rounded-lg bg-green-900/20 border border-green-500/30">
+              <div className="flex items-center">
+                <span className="text-green-300 text-lg mr-2">✅</span>
+                <div>
+                  <h3 className="font-medium text-green-300">All Systems Operational</h3>
+                  <p className="text-sm text-green-200">Last checked: {new Date().toLocaleTimeString()}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -210,54 +219,55 @@ export default function AdminOverview() {
       </div>
 
       {/* Platform Metrics */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Platform Metrics</h2>
-        
+      <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-purple-500/20 shadow-xl p-6">
+        <h2 className="text-xl font-semibold text-white mb-4">Platform Metrics</h2>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
-            <div className="text-3xl font-bold text-blue-600">
+            <div className="text-3xl font-bold text-blue-300">
               {stats.completedProfiles > 0 ? Math.round((stats.totalRequests / stats.completedProfiles) * 100) / 100 : 0}
             </div>
-            <div className="text-sm text-gray-600">Avg Requests per User</div>
+            <div className="text-sm text-gray-300">Avg Requests per User</div>
           </div>
-          
+
           <div className="text-center">
-            <div className="text-3xl font-bold text-green-600">
+            <div className="text-3xl font-bold text-green-300">
               {stats.totalMatches > 0 ? Math.round((stats.acceptedMatches / stats.totalMatches) * 100) : 0}%
             </div>
-            <div className="text-sm text-gray-600">Match Acceptance Rate</div>
+            <div className="text-sm text-gray-300">Match Acceptance Rate</div>
           </div>
-          
+
           <div className="text-center">
-            <div className="text-3xl font-bold text-purple-600">
+            <div className="text-3xl font-bold text-purple-300">
               {stats.totalUsers > 0 ? Math.round((stats.completedProfiles / stats.totalUsers) * 100) : 0}%
             </div>
-            <div className="text-sm text-gray-600">Profile Completion Rate</div>
+            <div className="text-sm text-gray-300">Profile Completion Rate</div>
           </div>
         </div>
       </div>
     </div>
   )
+
 }
 
 function MetricCard({ title, value, subtitle, icon, color }) {
   const colorClasses = {
-    blue: 'bg-blue-50 text-blue-600',
-    purple: 'bg-purple-50 text-purple-600',
-    green: 'bg-green-50 text-green-600',
-    orange: 'bg-orange-50 text-orange-600'
+    blue: 'bg-blue-900/30 text-blue-200 border border-blue-500/30',
+    purple: 'bg-purple-900/30 text-purple-200 border border-purple-500/30',
+    green: 'bg-green-900/30 text-green-200 border border-green-500/30',
+    orange: 'bg-orange-900/30 text-orange-200 border border-orange-500/30'
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-purple-500/20 shadow-xl p-6">
       <div className="flex items-center">
         <div className={`p-2 rounded-lg ${colorClasses[color]} mr-4`}>
           <span className="text-xl">{icon}</span>
         </div>
         <div>
-          <h3 className="text-sm font-medium text-gray-500">{title}</h3>
-          <div className="text-2xl font-bold text-gray-900">{value}</div>
-          <p className="text-sm text-gray-600">{subtitle}</p>
+          <h3 className="text-sm font-medium text-gray-300">{title}</h3>
+          <div className="text-2xl font-bold text-white">{value}</div>
+          <p className="text-sm text-gray-300">{subtitle}</p>
         </div>
       </div>
     </div>
@@ -266,19 +276,18 @@ function MetricCard({ title, value, subtitle, icon, color }) {
 
 function StatusItem({ label, status, description }) {
   const isHealthy = status === 'healthy'
-  
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center">
         <span className={`w-3 h-3 rounded-full mr-3 ${isHealthy ? 'bg-green-400' : 'bg-red-400'}`}></span>
         <div>
-          <div className="font-medium text-gray-900">{label}</div>
-          <div className="text-sm text-gray-600">{description}</div>
+          <div className="font-medium text-white">{label}</div>
+          <div className="text-sm text-gray-300">{description}</div>
         </div>
       </div>
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-        isHealthy ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-      }`}>
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${isHealthy ? 'bg-green-900/30 text-green-200 border border-green-500/30' : 'bg-red-900/30 text-red-200 border border-red-500/30'
+        }`}>
         {status}
       </span>
     </div>

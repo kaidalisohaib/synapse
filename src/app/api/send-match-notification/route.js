@@ -27,21 +27,36 @@ export async function POST(request) {
 
     const supabase = await createClient()
 
-    // SECURITY: Verify the request came from an authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    // SECURITY: Only allow system/admin to send match notifications
-    const isAdmin = adminConfig.emails.includes(user.email)
+    // SECURITY: Allow both authenticated admin users and system calls
+    const authHeader = request.headers.get('Authorization')
+    const isSystemCall = authHeader && authHeader.startsWith('Bearer ') && 
+                        authHeader.includes(process.env.SUPABASE_SERVICE_ROLE_KEY || 'invalid')
     
-    if (!isAdmin) {
+    let isAuthorized = false
+    
+    if (isSystemCall) {
+      // System call with service role key
+      isAuthorized = true
+    } else {
+      // Regular user authentication
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError || !user) {
+        return NextResponse.json(
+          { error: 'Unauthorized' },
+          { status: 401 }
+        )
+      }
+
+      // Check if user is admin
+      const isAdmin = adminConfig.emails.includes(user.email)
+      if (isAdmin) {
+        isAuthorized = true
+      }
+    }
+    
+    if (!isAuthorized) {
       return NextResponse.json(
-        { error: 'Forbidden: Only system can send match notifications' },
+        { error: 'Forbidden: Only system or admin can send match notifications' },
         { status: 403 }
       )
     }

@@ -93,6 +93,25 @@ export default function ProfileSetup() {
       if (error) {
         setMessage(error.message)
       } else {
+        // Trigger re-matching for unmatched requests (in background)
+        try {
+          fetch('/api/retry-matching', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              trigger: 'new_user',
+              systemWide: true // Flag to indicate this is a legitimate system-wide retry
+            }),
+          }).catch(error => {
+            console.log('Background re-matching failed:', error)
+            // Don't show error to user - this is a background operation
+          })
+        } catch (error) {
+          console.log('Background re-matching trigger failed:', error)
+        }
+        
         router.push('/dashboard')
       }
     } catch (error) {
